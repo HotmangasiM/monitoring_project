@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>IoT Sensor Dashboard</title>
+
+  <link rel="stylesheet" href="style.css" />
+
+  <!-- Chart.js -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+  <!-- TIME ADAPTER (WAJIB) -->
+  <script src="https://cdn.jsdelivr.net/npm/chartjs-adapter-date-fns"></script>
+</head>
+<body>
+
+  <header>
+    <h1>IoT Sensor Dashboard</h1>
+    <p id="lastUpdate">Last update: -</p>
+  </header>
+
+  <section id="sensorCards" class="grid"></section>
+
+  <section class="chart-section">
+    <h2 id="chartTitle">Sensor Trend</h2>
+    <canvas id="trendChart"></canvas>
+  </section>
+
+  <script src="script.js"></script>
+</body>
+</html>
