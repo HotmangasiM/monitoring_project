@@ -3,29 +3,60 @@
 <head>
   <meta charset="UTF-8" />
   <title>IoT Sensor Dashboard</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 
+  <!-- FONT -->
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Inter:300,400,500,600,700,900" />
+
+  <!-- ICONS -->
+  <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Rounded" rel="stylesheet" />
+
+  <!-- MATERIAL DASHBOARD CSS -->
   <link rel="stylesheet" href="style.css" />
 
-  <!-- Chart.js -->
+  <!-- CHART.JS -->
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-
-  <!-- TIME ADAPTER (WAJIB) -->
-  <script src="https://cdn.jsdelivr.net/npm/chartjs-adapter-date-fns"></script>
 </head>
+
 <body>
 
-  <header>
-    <h1>IoT Sensor Dashboard</h1>
-    <p id="lastUpdate">Last update: -</p>
+  <!-- ================= HEADER ================= -->
+  <header class="top-header">
+    <div class="header-left">
+      <h1>IoT Sensor Dashboard</h1>
+      <p class="subtitle">
+        Visualisasi rata-rata data sensor per jam (5 jam terakhir)
+      </p>
+    </div>
+
+    <div class="header-right">
+      <span class="material-symbols-rounded">schedule</span>
+      <span id="lastUpdate">Last update: -</span>
+    </div>
   </header>
 
-  <section id="sensorCards" class="grid"></section>
+  <!-- ================= MAIN CONTENT ================= -->
+  <main class="container">
 
-  <section class="chart-section">
-    <h2 id="chartTitle">Sensor Trend</h2>
-    <canvas id="trendChart"></canvas>
-  </section>
+    <!-- SENSOR GRID (DINAMIS) -->
+    <section id="sensorCards" class="sensor-grid">
+      <!-- Card sensor akan dirender via script.js -->
+    </section>
 
+  </main>
+
+  <!-- ================= FOOTER ================= -->
+  <footer class="footer">
+    © <span id="year"></span> IoT Monitoring Dashboard
+  </footer>
+
+  <!-- ================= SCRIPT ================= -->
   <script src="script.js"></script>
+
+  <script>
+    // tahun otomatis
+    document.getElementById("year").textContent = new Date().getFullYear();
+  </script>
+
 </body>
 </html>

@@ -1,119 +1,163 @@
-const API_BASE = "/api";
+/* =========================================================
+   CONFIG
+   ========================================================= */
+const API_BASE = "/api"; // ✅ FIX: HARUS /api
+const REFRESH_INTERVAL = 20000; // 20 detik
+const HOUR_LABELS = ["H-5", "H-4", "H-3", "H-2", "H-1"];
 
-let chart = null;
-let activeSensor = null;
+// simpan instance chart per sensor
+const charts = new Map();
 
-/* =========================
-   LOAD LATEST SENSOR VALUE
-   ========================= */
-async function loadLatest() {
-  const res = await fetch(`${API_BASE}/sensors/latest`);
-  const data = await res.json();
-  if (!data || data.length === 0) return;
+/* =========================================================
+   UTILITIES
+   ========================================================= */
+function formatDateTime(dateStr) {
+  return new Date(dateStr).toLocaleString();
+}
 
-  document.getElementById("lastUpdate").innerText =
-    "Last update: " + new Date(data[0].collected_at).toLocaleString();
+function getStatusBadge(value) {
+  if (value === null || value === undefined) {
+    return `<span class="badge badge-off">N/A</span>`;
+  }
+  if (value < 20) {
+    return `<span class="badge badge-danger">Rendah</span>`;
+  }
+  if (value < 60) {
+    return `<span class="badge badge-success">Normal</span>`;
+  }
+  return `<span class="badge badge-warning">Tinggi</span>`;
+}
 
-  // Sort Sensor 1, Sensor 2, ...
-  data.sort((a, b) => {
-    const na = parseInt(a.sensor_name.replace("Sensor ", ""));
-    const nb = parseInt(b.sensor_name.replace("Sensor ", ""));
-    return na - nb;
-  });
-
+/* =========================================================
+   RENDER SENSOR GRID
+   ========================================================= */
+function renderSensors(sensors) {
   const container = document.getElementById("sensorCards");
   container.innerHTML = "";
 
-  data.forEach(sensor => {
-    const card = document.createElement("div");
-    card.className = "card";
+  sensors.forEach(sensor => {
+    const canvasId = `chart-${sensor.name.replace(/\s+/g, "-")}`;
 
-    if (sensor.sensor_name === activeSensor) {
-      card.classList.add("active");
-    }
+    const card = document.createElement("div");
+    card.className = "sensor-card";
 
     card.innerHTML = `
-      <h3>${sensor.sensor_name}</h3>
-      <div class="value">${sensor.value}</div>
+      <div class="card-header">
+        <h3>${sensor.name}</h3>
+        ${getStatusBadge(sensor.lastValue)}
+      </div>
+
+      <p class="card-subtitle">
+        Rata-rata per jam (5 jam terakhir)
+      </p>
+
+      <div class="chart-wrapper">
+        <canvas id="${canvasId}" height="140"></canvas>
+      </div>
+
+      <div class="card-footer">
+        Nilai terakhir:
+        <strong>${sensor.lastValue ?? "-"} ${sensor.unit ?? ""}</strong>
+      </div>
     `;
 
-    // 👉 CLICK CARD = LOAD CHART
-    card.onclick = () => {
-      activeSensor = sensor.sensor_name;
-      loadTrend(sensor.sensor_name);
-      loadLatest();
-    };
-
     container.appendChild(card);
+
+    renderChart(
+      canvasId,
+      HOUR_LABELS.slice(-sensor.hourlyAvg.length),
+      sensor.hourlyAvg,
+      sensor.unit
+    );
   });
 }
 
-/* =========================
-   LOAD TREND FOR 1 SENSOR
-   ========================= */
-async function loadTrend(sensorName) {
-  const res = await fetch(
-    `${API_BASE}/sensors/history?sensor=${encodeURIComponent(sensorName)}&limit=60`
-  );
-  const data = await res.json();
-  if (!data || data.length === 0) return;
+/* =========================================================
+   CHART.JS
+   ========================================================= */
+function renderChart(canvasId, labels, data, unit) {
+  const ctx = document.getElementById(canvasId);
 
-  const labels = data.map(d =>
-    new Date(d.collected_at).toLocaleTimeString()
-  );
-  const values = data.map(d => d.value);
+  // destroy chart lama kalau ada
+  if (charts.has(canvasId)) {
+    charts.get(canvasId).destroy();
+  }
 
-  document.getElementById("chartTitle").innerText =
-    `Trend ${sensorName}`;
-
-  if (chart) chart.destroy();
-
-  chart = new Chart(document.getElementById("trendChart"), {
+  const chart = new Chart(ctx, {
     type: "line",
     data: {
       labels,
-      datasets: [{
-        label: sensorName,
-        data: values,
-        borderWidth: 3,
-        tension: 0.3,
-        pointRadius: 4
-      }]
+      datasets: [
+        {
+          data,
+          borderColor: "#43A047",
+          borderWidth: 2,
+          tension: 0.35,
+          pointRadius: 4,
+          pointBackgroundColor: "#43A047",
+          fill: false
+        }
+      ]
     },
     options: {
       responsive: true,
+      maintainAspectRatio: false,
       plugins: {
-        legend: { display: false }
-      },
-      scales: {
-        y: {
-          title: {
-            display: true,
-            text: "Sensor Value"
-          }
-        },
-        x: {
-          title: {
-            display: true,
-            text: "Time"
+        legend: { display: false },
+        tooltip: {
+          callbacks: {
+            label: ctx => `${ctx.parsed.y} ${unit ?? ""}`
           }
         }
+      },
+      scales: {
+        x: { display: false },
+        y: { display: false }
       }
     }
   });
+
+  charts.set(canvasId, chart);
 }
 
-/* =========================
-   AUTO REFRESH
-   ========================= */
-setInterval(() => {
-  loadLatest();
-  if (activeSensor) {
-    loadTrend(activeSensor);
-  }
-}, 20000);
+/* =========================================================
+   LOAD SENSOR TREND (MAIN DASHBOARD)
+   ========================================================= */
+async function loadSensorTrend() {
+  try {
+    const res = await fetch(`${API_BASE}/sensors/trend`);
+    const data = await res.json();
 
-/* =========================
+    if (!Array.isArray(data) || data.length === 0) {
+      document.getElementById("sensorCards").innerHTML =
+        "<p>Tidak ada data sensor</p>";
+      return;
+    }
+
+    // sort Sensor 1, Sensor 2, ...
+    data.sort((a, b) => {
+      const na = parseInt(a.name.replace("Sensor ", ""), 10);
+      const nb = parseInt(b.name.replace("Sensor ", ""), 10);
+      return na - nb;
+    });
+
+    renderSensors(data);
+
+    // update waktu terakhir (pakai waktu sekarang)
+    document.getElementById("lastUpdate").innerText =
+      "Last update: " + new Date().toLocaleString();
+
+  } catch (err) {
+    console.error("Failed to load sensor trend:", err);
+  }
+}
+
+/* =========================================================
+   AUTO REFRESH
+   ========================================================= */
+setInterval(loadSensorTrend, REFRESH_INTERVAL);
+
+/* =========================================================
    INITIAL LOAD
-   ========================= */
-loadLatest();
+   ========================================================= */
+loadSensorTrend();
