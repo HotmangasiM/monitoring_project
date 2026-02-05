@@ -19,3 +19,5 @@ exports.getDashboardTrend = async (req, res, next) => {
     next(err);
   }
 };
+
+// ini adalah log
