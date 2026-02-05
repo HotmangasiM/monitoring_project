@@ -22,25 +22,58 @@
 
 <body>
 
-<header class="top-header">
-  <div>
-    <h1>IoT Sensor Dashboard</h1>
-    <p class="subtitle">Rata-rata data sensor per jam (5 jam terakhir)</p>
+<div class="layout">
+
+  <!-- SIDEBAR -->
+  <aside class="sidebar">
+    <h2 class="logo">IoT Panel</h2>
+
+    <nav>
+      <a href="/" class="menu active">
+        <span class="material-symbols-rounded">dashboard</span>
+        Dashboard
+      </a>
+
+      <a href="monitoring.html" class="menu">
+        <span class="material-symbols-rounded">analytics</span>
+        Monitoring
+      </a>
+
+      <a href="#" class="menu disabled">
+        <span class="material-symbols-rounded">settings</span>
+        Settings
+      </a>
+    </nav>
+  </aside>
+
+  <!-- MAIN CONTENT -->
+  <div class="main">
+
+    <header class="top-header">
+      <div>
+        <h1>IoT Sensor Dashboard</h1>
+        <p class="subtitle">
+          Rata-rata data sensor per jam (5 jam terakhir)
+        </p>
+      </div>
+
+      <div class="header-right">
+        <span class="material-symbols-rounded">schedule</span>
+        <span id="lastUpdate">Last update: -</span>
+      </div>
+    </header>
+
+    <main class="container">
+      <section id="dashboard"></section>
+    </main>
+
+    <footer class="footer">
+      © <span id="year"></span> IoT Monitoring Dashboard
+    </footer>
+
   </div>
 
-  <div class="header-right">
-    <span class="material-symbols-rounded">schedule</span>
-    <span id="lastUpdate">Last update: -</span>
-  </div>
-</header>
-
-<main class="container">
-  <section id="dashboard"></section>
-</main>
-
-<footer class="footer">
-  © <span id="year"></span> IoT Monitoring Dashboard
-</footer>
+</div>
 
 <script src="script.js"></script>
 <script>
