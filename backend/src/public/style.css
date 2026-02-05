@@ -1,0 +1,109 @@
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+  font-family: Inter, system-ui, sans-serif;
+}
+
+body {
+  background: #f5f6fa;
+  color: #1f2937;
+  padding: 24px;
+}
+
+/* HEADER */
+.top-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 32px;
+}
+
+.top-header h1 {
+  font-size: 26px;
+  font-weight: 700;
+}
+
+.subtitle {
+  font-size: 14px;
+  color: #6b7280;
+  margin-top: 4px;
+}
+
+.header-right {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 14px;
+}
+
+/* LOCATION */
+.location-title {
+  margin: 24px 0 12px;
+  font-size: 20px;
+  font-weight: 700;
+}
+
+/* GRID */
+.sensor-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+  gap: 20px;
+}
+
+/* CARD */
+.sensor-card {
+  background: #fff;
+  border-radius: 14px;
+  padding: 16px;
+  box-shadow: 0 10px 24px rgba(0,0,0,.08);
+  display: flex;
+  flex-direction: column;
+}
+
+/* CARD HEADER */
+.card-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.card-header h3 {
+  font-size: 16px;
+  font-weight: 600;
+}
+
+/* BADGE */
+.badge {
+  padding: 4px 10px;
+  border-radius: 999px;
+  font-size: 12px;
+  font-weight: 600;
+  color: #fff;
+}
+
+.badge-success { background: #16a34a; }
+.badge-warning { background: #f59e0b; }
+.badge-danger  { background: #dc2626; }
+.badge-off     { background: #6b7280; }
+
+/* CHART */
+.chart-wrapper {
+  position: relative;
+  height: 120px;
+  margin: 12px 0;
+}
+
+/* FOOTER CARD */
+.card-footer {
+  font-size: 14px;
+  color: #374151;
+}
+
+/* PAGE FOOTER */
+.footer {
+  margin-top: 40px;
+  text-align: center;
+  font-size: 13px;
+  color: #6b7280;
+}

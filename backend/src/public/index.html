@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>IoT Sensor Dashboard</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+  <!-- FONT -->
+  <link rel="stylesheet"
+        href="https://fonts.googleapis.com/css?family=Inter:300,400,500,600,700" />
+
+  <!-- ICON -->
+  <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Rounded"
+        rel="stylesheet" />
+
+  <!-- CSS -->
+  <link rel="stylesheet" href="style.css" />
+
+  <!-- CHART -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+
+<body>
+
+<header class="top-header">
+  <div>
+    <h1>IoT Sensor Dashboard</h1>
+    <p class="subtitle">Rata-rata data sensor per jam (5 jam terakhir)</p>
+  </div>
+
+  <div class="header-right">
+    <span class="material-symbols-rounded">schedule</span>
+    <span id="lastUpdate">Last update: -</span>
+  </div>
+</header>
+
+<main class="container">
+  <section id="dashboard"></section>
+</main>
+
+<footer class="footer">
+  © <span id="year"></span> IoT Monitoring Dashboard
+</footer>
+
+<script src="script.js"></script>
+<script>
+  document.getElementById("year").textContent = new Date().getFullYear();
+</script>
+
+</body>
+</html>
