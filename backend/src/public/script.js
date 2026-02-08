@@ -3,15 +3,25 @@ const API_BASE = "/api";
 // simpan chart agar tidak double render
 const charts = new Map();
 
+// lock supaya loadDashboard tidak tabrakan
+let loading = false;
+
 /* =============================
    LOAD DASHBOARD (SNAPSHOT + TREND)
 ============================= */
 async function loadDashboard() {
+  if (loading) return; // ⛔ cegah double render
+  loading = true;
+
   try {
     const [snapRes, trendRes] = await Promise.all([
       fetch(`${API_BASE}/dashboard`),
       fetch(`${API_BASE}/dashboard/trend`)
     ]);
+
+    if (!snapRes.ok || !trendRes.ok) {
+      throw new Error("API error");
+    }
 
     const snapshot = await snapRes.json();
     const trends = await trendRes.json();
@@ -21,6 +31,10 @@ async function loadDashboard() {
 
     const container = document.getElementById("dashboard");
     if (!container) return;
+
+    // destroy semua chart lama sebelum clear DOM
+    charts.forEach(chart => chart.destroy());
+    charts.clear();
 
     container.innerHTML = "";
 
@@ -42,7 +56,7 @@ async function loadDashboard() {
         );
 
         grid.appendChild(
-          renderSensorCard(sensor, trendValues)
+          renderSensorCard(sensor, trendValues, loc.location)
         );
       });
 
@@ -55,12 +69,16 @@ async function loadDashboard() {
   } catch (err) {
     console.error("Failed load dashboard:", err);
   }
+
+  loading = false; // unlock
 }
 
 /* =============================
    AMBIL DATA TREND PER SENSOR
 ============================= */
 function getTrendValues(trends, location, sensorCode) {
+  if (!Array.isArray(trends)) return [];
+
   const loc = trends.find(l => l.location === location);
   if (!loc) return [];
 
@@ -71,12 +89,13 @@ function getTrendValues(trends, location, sensorCode) {
 /* =============================
    RENDER SENSOR CARD
 ============================= */
-function renderSensorCard(sensor, trendValues) {
+function renderSensorCard(sensor, trendValues, locationName) {
   const card = document.createElement("div");
   card.className = "sensor-card";
 
-  const canvasId = `${sensor.code}-${Math.random()}`
-    .replace(".", "");
+  // 🔥 ID stabil
+  const canvasId = `${locationName}-${sensor.code}`
+    .replace(/\s/g, "_");
 
   card.innerHTML = `
     <div class="card-header">
@@ -96,9 +115,8 @@ function renderSensorCard(sensor, trendValues) {
     </div>
   `;
 
-  // chart hanya dirender jika data trend ada
   setTimeout(() => {
-  if (Array.isArray(trendValues) && trendValues.length >= 1) {
+    if (Array.isArray(trendValues) && trendValues.length >= 1) {
       renderChart(canvasId, trendValues, sensor.unit);
     }
   });
@@ -106,14 +124,15 @@ function renderSensorCard(sensor, trendValues) {
   return card;
 }
 
+
 /* =============================
    RENDER CHART
 ============================= */
-function renderChart(canvasId, values, unit) {
+function renderChart(canvasId, values) {
   const ctx = document.getElementById(canvasId);
   if (!ctx) return;
 
-  // destroy chart lama
+  // destroy chart lama jika ada
   if (charts.has(canvasId)) {
     charts.get(canvasId).destroy();
     charts.delete(canvasId);
@@ -163,6 +182,10 @@ function badgeClass(severity) {
     default: return "badge-off";
   }
 }
+
+/* =============================
+   AUTO REFRESH
+============================= */
 setInterval(loadDashboard, 20000);
 
 /* =============================

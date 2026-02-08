@@ -2,36 +2,32 @@ const db = require("../config/db");
 
 async function getLatestDashboardSnapshot() {
   const [rows] = await db.query(`
-    SELECT
-      l.id   AS location_id,
-      l.name AS location_name,
-
-      st.code AS sensor_code,
-      st.label AS sensor_name,
-      st.unit,
-
-      sd.value
-    FROM sensor_data sd
-    JOIN locations l
-      ON sd.location_id = l.id
-    JOIN sensor_types st
-      ON sd.sensor_code = st.code
-    JOIN (
+    SELECT *
+    FROM (
       SELECT
-        location_id,
-        sensor_code,
-        MAX(collected_at) AS latest_time
-      FROM sensor_data
-      GROUP BY location_id, sensor_code
-    ) latest
-      ON sd.location_id = latest.location_id
-     AND sd.sensor_code = latest.sensor_code
-     AND sd.collected_at = latest.latest_time
-    ORDER BY l.id, st.code
+        l.id   AS location_id,
+        l.name AS location_name,
+        st.code AS sensor_code,
+        st.label AS sensor_name,
+        st.unit,
+        sd.value,
+
+        ROW_NUMBER() OVER (
+          PARTITION BY sd.location_id, sd.sensor_code
+          ORDER BY sd.collected_at DESC, sd.id DESC
+        ) AS rn
+
+      FROM sensor_data sd
+      JOIN locations l ON sd.location_id = l.id
+      JOIN sensor_types st ON sd.sensor_code = st.code
+    ) ranked
+    WHERE rn = 1
+    ORDER BY location_id, sensor_code
   `);
 
   return rows;
 }
+
 
 async function getDashboardTrend() {
   const [rows] = await db.query(`

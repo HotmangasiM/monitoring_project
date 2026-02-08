@@ -1,6 +1,6 @@
 @echo off
 echo Starting backend ...
-start cmd /k "node app.js"
+start cmd /k "node server.js"
 
 timeout /t 3
 

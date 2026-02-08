@@ -3,7 +3,7 @@ const { parse } = require("csv-parse/sync");
 const repo = require("../repositories/sheetImportRepository");
 
 const SHEET_CSV_URL =
-  "https://docs.google.com/spreadsheets/d/1-cSPpjALHvvOqb2mgbkmDB0PZz0sBGk2/export?format=csv";
+  "https://docs.google.com/spreadsheets/d/1rtYvS3eXwnBvbRGn3gLupf6cqSmSfXR2t1SYDELRD5k/export?format=csv";
 
 const SENSOR_NAME_MAP = {
   "sensor 1": "TEMP",
