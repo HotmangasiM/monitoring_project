@@ -1,6 +1,7 @@
 const axios = require("axios");
 const { parse } = require("csv-parse/sync");
 const repo = require("../repositories/sheetImportRepository");
+const { nowUTC, nowWIB } = require("../utils/time");
 
 const SHEET_CSV_URL =
   "https://docs.google.com/spreadsheets/d/1rtYvS3eXwnBvbRGn3gLupf6cqSmSfXR2t1SYDELRD5k/export?format=csv";
@@ -13,7 +14,7 @@ const SENSOR_NAME_MAP = {
 };
 
 async function importSheetSnapshot() {
-  console.log("📥 Importing sheet...");
+  console.log(`[${nowWIB()}] 📥 Importing sheet...`);
 
   try {
     const locations = await repo.getActiveLocations();
@@ -24,7 +25,7 @@ async function importSheetSnapshot() {
     });
 
     const response = await axios.get(SHEET_CSV_URL, {
-      timeout: 15000, // ⬅ penting
+      timeout: 15000, 
       headers: {
         "User-Agent": "monitoring-app"
       }
@@ -34,7 +35,7 @@ async function importSheetSnapshot() {
       skip_empty_lines: true
     });
 
-    const now = new Date();
+    const now = nowUTC();
     const snapshot = [];
 
     let currentLocationName = null;
@@ -66,13 +67,13 @@ async function importSheetSnapshot() {
 
     if (snapshot.length > 0) {
       await repo.insertSnapshot(snapshot);
-      console.log(`✅ Inserted ${snapshot.length} rows`);
+      console.log(`[${nowWIB()}] ✅ Inserted ${snapshot.length} rows`);
     } else {
-      console.log("⚠️ No valid data");
+      console.log(`[${nowWIB()}] ⚠️ No valid data`);
     }
 
   } catch (err) {
-    console.error("Import error:", err.message);
+    console.error(`[${nowWIB()}] ❌ Import error:`, err.message);
   }
 }
 

@@ -1,4 +1,5 @@
 const service = require("../service/monitoringService");
+const { fromWIBtoUTC } = require("../utils/time");
 
 exports.getMonitoring = async(req, res, next) => {
     try {
@@ -6,7 +7,10 @@ exports.getMonitoring = async(req, res, next) => {
         if(!from || !to){
             return res.status(400).json({ error: "Missing Range" });
         }
-        const data = await service.getMonitoringData(from, to);
+        const fromUTC = fromWIBtoUTC(from);
+        const toUTC = fromWIBtoUTC(to);
+
+        const data = await service.getMonitoringData(fromUTC, toUTC);
         res.json(data);
     } catch (error) {
         next(error);
@@ -16,8 +20,10 @@ exports.getMonitoring = async(req, res, next) => {
 exports.exportCSV = async (req, res, next) => {
     try {
         const {from, to} = req.query;
+        const fromUTC = fromWIBtoUTC(from);
+        const toUTC = fromWIBtoUTC(to);
 
-        const csv = await service.getMonitoringCSV(from, to);
+        const csv = await service.getMonitoringCSV(fromUTC, toUTC);
 
         res.setHeader("Content-Type", "text/csv");
         res.setHeader(
