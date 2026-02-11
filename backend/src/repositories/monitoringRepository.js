@@ -6,7 +6,7 @@ async function getMonitoringRange(from, to) {
       l.name AS location,
       sd.sensor_code AS sensor,
       DATE_FORMAT(sd.collected_at, '%Y-%m-%d %H:00:00') AS hour,
-      AVG(sd.value) AS avg
+      ROUND(AVG(sd.value), 1) AS avg
     FROM sensor_data sd
     JOIN locations l ON sd.location_id = l.id
     WHERE sd.collected_at BETWEEN ? AND ?

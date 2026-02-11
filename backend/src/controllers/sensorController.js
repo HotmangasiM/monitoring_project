@@ -32,3 +32,12 @@ exports.getSensorTrend = async (req, res, next) => {
     next(err);
   }
 };
+
+exports.getSensorStatus = async (req, res, next) => {
+  try {
+    const data = await service.getSensorStatus();
+    res.json(data);
+  } catch (err) {
+    next(err);
+  }
+};

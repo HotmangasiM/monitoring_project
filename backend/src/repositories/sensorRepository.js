@@ -75,10 +75,26 @@ async function getActiveSensors() {
   return rows;
 }
 
+async function getLastSeen() {
+  const [rows] = await db.query(`
+    SELECT
+      l.name AS location,
+      sd.sensor_code AS sensor,
+      MAX(sd.collected_at) AS last_seen
+    FROM sensor_data sd
+    JOIN locations l ON sd.location_id = l.id
+    GROUP BY l.id, sd.sensor_code
+  `);
+
+  return rows;
+}
+
+
 module.exports = {
   getLatestSnapshot,
   getSensorHistory,
   getHourlyAvg,
   getLatestValues,
-  getActiveSensors
+  getActiveSensors,
+  getLastSeen
 };

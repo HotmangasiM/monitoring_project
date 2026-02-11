@@ -48,8 +48,28 @@ async function getSensorTrend() {
   });
 }
 
+async function getSensorStatus() {
+  const rows = await repo.getLastSeen();
+
+  const now = new Date();
+
+  return rows.map(r => {
+    const last = new Date(r.last_seen);
+
+    const diffMinutes =
+      (now - last) / 60000;
+
+    return {
+      location: r.location,
+      sensor: r.sensor,
+      online: diffMinutes < 10 // kasih toleransi
+    };
+  });
+}
+
 module.exports = {
   getLatestSnapshot,
   getSensorHistory,
-  getSensorTrend
+  getSensorTrend,
+  getSensorStatus
 };

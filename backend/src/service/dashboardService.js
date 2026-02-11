@@ -56,7 +56,7 @@ async function getDashboardTrend() {
     }
 
     map[row.location_id].sensors[row.sensor_code]
-      .values.push(Number(row.avg_value));
+      .values.push(Number(Number(row.avg_value).toFixed(1)));
   });
 
   return Object.values(map).map(loc => ({

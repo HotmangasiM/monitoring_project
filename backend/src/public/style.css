@@ -292,3 +292,54 @@ body {
 .filter-bar button:hover {
   background: #1D4ED8;
 }
+
+/* SORTABLE TABLE */
+
+.sortable {
+  cursor: pointer;
+  user-select: none;
+  transition: background .15s ease, color .15s ease;
+  position: relative;
+}
+
+.sortable:hover {
+  background: #EEF2FF;
+}
+
+.sortable.active {
+  background: #E0E7FF;
+  color: #1D4ED8;
+}
+
+.arrow {
+  font-size: 18px;
+  margin-left: 6px;
+  opacity: 0.5;
+  vertical-align: middle;
+  transition: all .15s ease;
+}
+
+.sortable.active .arrow {
+  opacity: 1;
+  color: #2563EB;
+  transform: scale(1.15);
+}
+
+
+.sensor-status {
+  padding: 4px 10px;
+  border-radius: 999px;
+  font-size: 12px;
+  font-weight: 600;
+}
+
+.sensor-status.active {
+  background: #DCFCE7;
+  color: #15803D;
+}
+
+.sensor-status.offline {
+  background: #FEE2E2;
+  color: #991B1B;
+}
+

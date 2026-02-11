@@ -7,5 +7,6 @@ const sensorController = require("../controllers/sensorController");
 router.get("/latest", sensorController.getLatestSnapshot);
 router.get("/history", sensorController.getSensorHistory);
 router.get("/trend", sensorController.getSensorTrend);
+router.get("/status", sensorController.getSensorStatus);
 
 module.exports = router;
