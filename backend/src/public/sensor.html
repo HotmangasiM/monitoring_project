@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Sensors</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+  <link rel="stylesheet" href="style.css" />
+</head>
+
+<body>
+
+<div class="layout">
+
+  <!-- SIDEBAR -->
+  <aside class="sidebar">
+    <h2 class="logo">IoT Panel</h2>
+
+    <nav>
+      <a href="/" class="menu">📊 Dashboard</a>
+      <a href="monitoring.html" class="menu">📈 Monitoring</a>
+      <a href="sensors.html" class="menu active">📡 Sensors</a>
+    </nav>
+  </aside>
+
+  <!-- MAIN -->
+  <div class="main">
+
+    <header class="top-header">
+      <div>
+        <h1>Sensor Status</h1>
+        <p class="subtitle">Live sensor health monitoring</p>
+      </div>
+    </header>
+
+    <main class="container">
+
+      <table class="monitoring-table">
+        <thead>
+          <tr>
+            <th>Location</th>
+            <th>Sensor</th>
+            <th>Status</th>
+          </tr>
+        </thead>
+
+        <tbody id="sensorBody"></tbody>
+
+      </table>
+
+    </main>
+
+  </div>
+
+</div>
+
+<script src="sensor.js"></script>
+</body>
+</html>
