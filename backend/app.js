@@ -12,14 +12,14 @@ const app = express();
 app.use(cors());
 app.use(express.json());
 
+// static frontend
+app.use(express.static(path.join(__dirname, "src/public")));
+
 // API routes
 app.use("/api/sensors", sensorRoutes);
 app.use("/api/dashboard", dashboardRoutes);
 app.use("/api/monitoring", monitoringRoutes);
 
 app.use(errorMiddleware);
-
-// static frontend
-app.use(express.static(path.join(__dirname, "src/public")));
 
 module.exports = app;
