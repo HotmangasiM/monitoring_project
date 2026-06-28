@@ -17,10 +17,25 @@ async function getMonitoringCSV(from, to) {
 
     const body = rows.map(r => {
         const hourWIB = toWIB(r.hour);
-        return `${r.location},${r.sensor},${hourWIB},${r.avg}`;
+        return [
+            escapeCSV(r.location),
+            escapeCSV(r.sensor),
+            escapeCSV(hourWIB),
+            escapeCSV(r.avg)
+        ].join(",");
     }).join("\n");
 
     return header + body;
+}
+
+function escapeCSV(value) {
+    const text = value === null || value === undefined ? "" : String(value);
+
+    if (/[",\n\r]/.test(text)) {
+        return `"${text.replace(/"/g, '""')}"`;
+    }
+
+    return text;
 }
 
 module.exports = {

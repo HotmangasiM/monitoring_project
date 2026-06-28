@@ -11,7 +11,7 @@ async function getMonitoringRange(from, to) {
     JOIN locations l ON sd.location_id = l.id
     WHERE sd.collected_at BETWEEN ? AND ?
     GROUP BY l.id, sd.sensor_code, hour
-    ORDER BY hour
+    ORDER BY hour, l.id, sd.sensor_code
   `, [from, to]);
 
   return rows;

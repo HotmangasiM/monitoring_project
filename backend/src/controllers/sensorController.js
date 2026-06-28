@@ -17,7 +17,13 @@ exports.getSensorHistory = async (req, res, next) => {
       return res.status(400).json({ error: "sensor query is required" });
     }
 
-    const data = await service.getSensorHistory(sensor, Number(limit));
+    const parsedLimit = Number(limit);
+
+    if (!Number.isInteger(parsedLimit) || parsedLimit < 1 || parsedLimit > 500) {
+      return res.status(400).json({ error: "limit must be an integer between 1 and 500" });
+    }
+
+    const data = await service.getSensorHistory(String(sensor).toUpperCase(), parsedLimit);
     res.json(data);
   } catch (err) {
     next(err);

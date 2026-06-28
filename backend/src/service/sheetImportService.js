@@ -73,8 +73,18 @@ async function importSheetSnapshot() {
     }
 
   } catch (err) {
-    console.error(`[${nowWIB()}] ❌ Import error:`, err.message);
+    console.error(`[${nowWIB()}] ❌ Import error:`, formatImportError(err));
   }
+}
+
+function formatImportError(err) {
+  const parts = [
+    err.message || "Unknown error",
+    err.code ? `code=${err.code}` : null,
+    err.response?.status ? `status=${err.response.status}` : null
+  ].filter(Boolean);
+
+  return parts.join(" ");
 }
 
 module.exports = {

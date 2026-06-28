@@ -2,83 +2,162 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <title>IoT Sensor Dashboard</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>IoT Monitoring Dashboard</title>
 
-  <!-- FONT -->
-  <link rel="stylesheet"
-        href="https://fonts.googleapis.com/css?family=Inter:300,400,500,600,700" />
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 
-  <!-- ICON -->
-  <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Rounded"
-        rel="stylesheet" />
-
-  <!-- CSS -->
-  <link rel="stylesheet" href="style.css" />
-
-  <!-- CHART -->
-  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <link rel="stylesheet" href="./css/variables.css" />
+  <link rel="stylesheet" href="./css/base.css" />
+  <link rel="stylesheet" href="./css/layout.css" />
+  <link rel="stylesheet" href="./css/components.css" />
+  <link rel="stylesheet" href="./css/dashboard.css" />
 </head>
-
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <body>
-
-<div class="layout">
-
-  <!-- SIDEBAR -->
-  <aside class="sidebar">
-    <h2 class="logo">IoT Panel</h2>
-
-    <nav>
-      <a href="/" class="menu active">
-        <span class="material-symbols-rounded">dashboard</span>
-        Dashboard
-      </a>
-
-      <a href="monitoring.html" class="menu">
-        <span class="material-symbols-rounded">analytics</span>
-        Monitoring
-      </a>
-
-      <a href="sensor.html" class="menu">
-        <span class="material-symbols-rounded">settings</span>
-        Sensor
-      </a>
-    </nav>
-  </aside>
-
-  <!-- MAIN CONTENT -->
-  <div class="main">
-
-    <header class="top-header">
-      <div>
-        <h1>IoT Sensor Dashboard</h1>
-        <p class="subtitle">
-          Rata-rata data sensor per jam (5 jam terakhir)
-        </p>
+  <div class="app-shell">
+    <aside class="sidebar">
+      <div class="sidebar__brand">
+        <div class="sidebar__logo">I</div>
+        <div>
+          <h1 class="sidebar__title">IoT Panel</h1>
+          <p class="sidebar__subtitle">Monitoring Hub</p>
+        </div>
       </div>
 
-      <div class="header-right">
-        <span class="material-symbols-rounded">schedule</span>
-        <span id="lastUpdate">Last update: -</span>
-      </div>
-    </header>
+      <nav class="sidebar__nav">
+        <a href="/" class="nav-link nav-link--active">Dashboard</a>
+        <a href="/pages/monitoring.html" class="nav-link">Monitoring</a>
+        <a href="/pages/sensor.html" class="nav-link">Sensors</a>
+        <a href="#" class="nav-link">Reports</a>
+        <a href="#" class="nav-link">Settings</a>
+      </nav>
+    </aside>
 
-    <main class="container">
-      <section id="dashboard"></section>
+    <main class="main-content">
+      <header class="topbar">
+        <div>
+          <p class="page-eyebrow">Real-time Monitoring</p>
+          <h2 class="page-title">IoT Sensor Dashboard</h2>
+          <p class="page-description">
+            Monitor sensor status, location performance, and hourly trends.
+          </p>
+        </div>
+
+        <div class="topbar__actions">
+          <div class="status-chip">
+            <span class="status-dot status-dot--success"></span>
+            System Healthy
+          </div>
+
+          <div class="mini-status-group">
+            <span class="mini-status">Sync OK</span>
+            <span class="mini-status">DB Connected</span>
+            <span class="mini-status">20s Refresh</span>
+          </div>
+
+          <div class="last-update">
+            Last update: <span id="lastUpdateText">-</span>
+          </div>
+
+          <button class="btn btn--primary" id="refreshButton">Refresh</button>
+        </div>
+      </header>
+
+      <section class="summary-grid" id="summaryGrid">
+        <div class="summary-card">
+          <p class="summary-card__label">Total Locations</p>
+          <h3 class="summary-card__value">0</h3>
+        </div>
+        <div class="summary-card">
+          <p class="summary-card__label">Total Sensors</p>
+          <h3 class="summary-card__value">0</h3>
+        </div>
+        <div class="summary-card">
+          <p class="summary-card__label">Normal</p>
+          <h3 class="summary-card__value summary-card__value--success">0</h3>
+        </div>
+        <div class="summary-card">
+          <p class="summary-card__label">Warning</p>
+          <h3 class="summary-card__value summary-card__value--warning">0</h3>
+        </div>
+        <div class="summary-card">
+          <p class="summary-card__label">Critical</p>
+          <h3 class="summary-card__value summary-card__value--danger">0</h3>
+        </div>
+      </section>
+
+      <section class="dashboard-grid">
+        <div class="panel panel--large">
+          <div class="panel__header">
+            <div>
+              <p class="panel__eyebrow">Locations</p>
+              <h3 class="panel__title">Location Status Overview</h3>
+            </div>
+          </div>
+          <div id="locationsContainer" class="locations-list">
+            <p class="empty-state">No sensor data loaded yet.</p>
+          </div>
+        </div>
+
+        <div class="panel alerts-panel">
+          <div class="panel__header">
+            <div>
+              <p class="panel__eyebrow">Alerts</p>
+              <h3 class="panel__title">Active Alerts</h3>
+            </div>
+          </div>
+
+          <div class="alerts-summary" id="alertsSummary">
+            <div class="alert-stat">
+              <span class="alert-stat__label">Total Alerts</span>
+              <strong class="alert-stat__value">0</strong>
+            </div>
+            <div class="alert-stat">
+              <span class="alert-stat__label">Critical</span>
+              <strong class="alert-stat__value alert-stat__value--danger">0</strong>
+            </div>
+            <div class="alert-stat">
+              <span class="alert-stat__label">Warning</span>
+              <strong class="alert-stat__value alert-stat__value--warning">0</strong>
+            </div>
+          </div>
+
+          <div id="alertsContainer" class="alerts-list">
+            <p class="empty-state">No active alerts.</p>
+          </div>
+        </div>
+      </section>
+
+      <section class="panel">
+        <div class="panel__header panel__header--trend">
+          <div>
+            <p class="panel__eyebrow">Trends</p>
+            <h3 class="panel__title">Hourly Sensor Trends</h3>
+          </div>
+
+          <div class="trend-filters">
+            <select id="locationSelect" class="filter-select">
+              <option value="">Select location</option>
+            </select>
+
+            <select id="sensorSelect" class="filter-select">
+              <option value="">Select sensor</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="trend-chart-wrapper">
+          <canvas id="trendChart"></canvas>
+        </div>
+    </section>
     </main>
-
-    <footer class="footer">
-      © <span id="year"></span> IoT Monitoring Dashboard
-    </footer>
-
   </div>
 
-</div>
-
-<script src="script.js"></script>
-<script>
-  document.getElementById("year").textContent = new Date().getFullYear();
-</script>
-
+  <script src="./js/api.js"></script>
+  <script src="./js/ui.js"></script>
+  <script src="./js/dashboard.js"></script>
 </body>
 </html>

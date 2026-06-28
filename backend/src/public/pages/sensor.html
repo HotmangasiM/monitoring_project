@@ -1,0 +1,153 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Sensor Status</title>
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+
+  <link rel="stylesheet" href="../css/variables.css" />
+  <link rel="stylesheet" href="../css/base.css" />
+  <link rel="stylesheet" href="../css/layout.css" />
+  <link rel="stylesheet" href="../css/components.css" />
+  <link rel="stylesheet" href="../css/sensor.css" />
+</head>
+<body>
+  <div class="app-shell">
+    <aside class="sidebar">
+      <div class="sidebar__brand">
+        <div class="sidebar__logo">I</div>
+        <div>
+          <h1 class="sidebar__title">IoT Panel</h1>
+          <p class="sidebar__subtitle">Monitoring Hub</p>
+        </div>
+      </div>
+
+      <nav class="sidebar__nav">
+        <a href="/" class="nav-link">Dashboard</a>
+        <a href="/pages/monitoring.html" class="nav-link">Monitoring</a>
+        <a href="/pages/sensor.html" class="nav-link nav-link--active">Sensors</a>
+        <a href="#" class="nav-link">Reports</a>
+        <a href="#" class="nav-link">Settings</a>
+      </nav>
+    </aside>
+
+    <main class="main-content">
+      <header class="topbar">
+        <div>
+          <p class="page-eyebrow">Sensor Status</p>
+          <h2 class="page-title">Live Sensor Health Monitoring</h2>
+          <p class="page-description">
+            Monitor active and offline sensors across all locations in real time.
+          </p>
+        </div>
+
+        <div class="topbar__actions">
+          <div class="status-chip">
+            <span class="status-dot status-dot--success"></span>
+            Auto Refresh 15s
+          </div>
+          <div class="last-update">
+            Last update: <span id="lastSensorUpdate">-</span>
+          </div>
+          <button class="btn btn--primary" id="refreshSensors">Refresh</button>
+        </div>
+      </header>
+
+      <section class="sensor-summary-grid" id="sensorSummary">
+        <div class="summary-card">
+          <p class="summary-card__label">Total Sensors</p>
+          <h3 class="summary-card__value">0</h3>
+        </div>
+        <div class="summary-card">
+          <p class="summary-card__label">Active</p>
+          <h3 class="summary-card__value summary-card__value--success">0</h3>
+        </div>
+        <div class="summary-card">
+          <p class="summary-card__label">Offline</p>
+          <h3 class="summary-card__value summary-card__value--danger">0</h3>
+        </div>
+        <div class="summary-card">
+          <p class="summary-card__label">Locations</p>
+          <h3 class="summary-card__value">0</h3>
+        </div>
+      </section>
+
+      <section class="panel">
+        <div class="panel__header">
+          <div>
+            <p class="panel__eyebrow">Filters</p>
+            <h3 class="panel__title">Filter Sensors</h3>
+          </div>
+        </div>
+
+        <div class="sensor-filter-panel">
+          <div class="filter-field">
+            <label for="locationFilter">Location</label>
+            <select id="locationFilter">
+              <option value="">All locations</option>
+            </select>
+          </div>
+
+          <div class="filter-field">
+            <label for="sensorFilter">Sensor</label>
+            <select id="sensorFilter">
+              <option value="">All sensors</option>
+            </select>
+          </div>
+
+          <div class="filter-field">
+            <label for="statusFilter">Status</label>
+            <select id="statusFilter">
+              <option value="">All status</option>
+              <option value="active">Active</option>
+              <option value="offline">Offline</option>
+            </select>
+          </div>
+
+          <div class="filter-actions">
+            <button class="btn btn--primary" id="applySensorFilter">Apply</button>
+            <button class="btn btn--secondary" id="resetSensorFilter">Reset</button>
+          </div>
+        </div>
+      </section>
+
+      <section class="panel">
+        <div class="panel__header panel__header--table">
+          <div>
+            <p class="panel__eyebrow">Results</p>
+            <h3 class="panel__title">Sensor Status Table</h3>
+          </div>
+
+          <div class="table-meta">
+            <span id="sensorResultCount">0 sensors</span>
+          </div>
+        </div>
+
+        <div class="table-wrapper">
+          <table class="sensor-table">
+            <thead>
+              <tr>
+                <th>Location</th>
+                <th>Sensor</th>
+                <th>Status</th>
+              </tr>
+            </thead>
+            <tbody id="sensorBody">
+              <tr>
+                <td colspan="3" class="table-empty">No sensor data loaded yet.</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </section>
+    </main>
+  </div>
+
+  <script src="../js/ui.js"></script>
+  <script src="../js/sensor.js"></script>
+</body>
+</html>

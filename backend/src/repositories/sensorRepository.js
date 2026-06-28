@@ -3,16 +3,31 @@ const db = require("../config/db");
 /* Latest snapshot */
 async function getLatestSnapshot() {
   const [rows] = await db.query(`
-    SELECT sd.sensor_name, sd.value, sd.collected_at
-    FROM sensor_data sd
-    INNER JOIN (
-      SELECT sensor_name, MAX(collected_at) AS last_time
-      FROM sensor_data
-      GROUP BY sensor_name
+    SELECT
+      location,
+      sensor_code,
+      sensor_name,
+      unit,
+      value,
+      collected_at
+    FROM (
+      SELECT
+        l.name AS location,
+        st.code AS sensor_code,
+        st.label AS sensor_name,
+        st.unit,
+        sd.value,
+        sd.collected_at,
+        ROW_NUMBER() OVER (
+          PARTITION BY sd.location_id, sd.sensor_code
+          ORDER BY sd.collected_at DESC, sd.id DESC
+        ) AS rn
+      FROM sensor_data sd
+      JOIN locations l ON sd.location_id = l.id
+      JOIN sensor_types st ON sd.sensor_code = st.code
     ) latest
-    ON sd.sensor_name = latest.sensor_name
-    AND sd.collected_at = latest.last_time
-    ORDER BY CAST(SUBSTRING(sd.sensor_name, 8) AS UNSIGNED)
+    WHERE rn = 1
+    ORDER BY location, sensor_code
   `);
 
   return rows;
@@ -21,10 +36,18 @@ async function getLatestSnapshot() {
 /* History */
 async function getSensorHistory(sensor, limit) {
   const [rows] = await db.query(`
-    SELECT value, collected_at
-    FROM sensor_data
-    WHERE sensor_name = ?
-    ORDER BY collected_at DESC
+    SELECT
+      l.name AS location,
+      sd.sensor_code,
+      st.label AS sensor_name,
+      st.unit,
+      sd.value,
+      sd.collected_at
+    FROM sensor_data sd
+    JOIN locations l ON sd.location_id = l.id
+    JOIN sensor_types st ON sd.sensor_code = st.code
+    WHERE sd.sensor_code = ?
+    ORDER BY sd.collected_at DESC, sd.location_id DESC, sd.id DESC
     LIMIT ?
   `, [sensor, limit]);
 
@@ -35,13 +58,19 @@ async function getSensorHistory(sensor, limit) {
 async function getHourlyAvg() {
   const [rows] = await db.query(`
     SELECT
-      sd.sensor_name,
+      sd.sensor_code,
+      st.label AS sensor_name,
+      st.unit,
       DATE_FORMAT(sd.collected_at, '%Y-%m-%d %H:00:00') AS hour_bucket,
       AVG(sd.value) AS avg_value
     FROM sensor_data sd
-    WHERE sd.collected_at >= NOW() - INTERVAL 5 HOUR
-    GROUP BY sd.sensor_name, hour_bucket
-    ORDER BY sd.sensor_name, hour_bucket
+    JOIN sensor_types st ON sd.sensor_code = st.code
+    WHERE sd.collected_at >= (
+      SELECT COALESCE(MAX(collected_at), NOW()) - INTERVAL 5 HOUR
+      FROM sensor_data
+    )
+    GROUP BY sd.sensor_code, st.label, st.unit, hour_bucket
+    ORDER BY sd.sensor_code, hour_bucket
   `);
 
   return rows;
@@ -50,15 +79,25 @@ async function getHourlyAvg() {
 /* Latest values */
 async function getLatestValues() {
   const [rows] = await db.query(`
-    SELECT sd.sensor_name, sd.value
-    FROM sensor_data sd
-    INNER JOIN (
-      SELECT sensor_name, MAX(collected_at) AS last_time
-      FROM sensor_data
-      GROUP BY sensor_name
+    SELECT
+      sensor_code,
+      sensor_name,
+      unit,
+      value
+    FROM (
+      SELECT
+        sd.sensor_code,
+        st.label AS sensor_name,
+        st.unit,
+        sd.value,
+        ROW_NUMBER() OVER (
+          PARTITION BY sd.sensor_code
+          ORDER BY sd.collected_at DESC, sd.id DESC
+        ) AS rn
+      FROM sensor_data sd
+      JOIN sensor_types st ON sd.sensor_code = st.code
     ) latest
-    ON sd.sensor_name = latest.sensor_name
-    AND sd.collected_at = latest.last_time
+    WHERE rn = 1
   `);
 
   return rows;
@@ -67,9 +106,17 @@ async function getLatestValues() {
 /* Active sensors */
 async function getActiveSensors() {
   const [rows] = await db.query(`
-    SELECT DISTINCT sensor_name
-    FROM sensor_data
-    WHERE collected_at >= NOW() - INTERVAL 5 HOUR
+    SELECT DISTINCT
+      sd.sensor_code,
+      st.label AS sensor_name,
+      st.unit
+    FROM sensor_data sd
+    JOIN sensor_types st ON sd.sensor_code = st.code
+    WHERE sd.collected_at >= (
+      SELECT COALESCE(MAX(collected_at), NOW()) - INTERVAL 5 HOUR
+      FROM sensor_data
+    )
+    ORDER BY sd.sensor_code
   `);
 
   return rows;

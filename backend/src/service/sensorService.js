@@ -19,32 +19,31 @@ async function getSensorTrend() {
 
   const lastValueMap = {};
   latestRows.forEach(r => {
-    lastValueMap[r.sensor_name] = r.value;
+    lastValueMap[r.sensor_code] = r.value;
   });
 
   const sensorMap = {};
 
   activeSensors.forEach(s => {
-    sensorMap[s.sensor_name] = {
+    sensorMap[s.sensor_code] = {
+      code: s.sensor_code,
       name: s.sensor_name,
-      unit: "",
-      lastValue: lastValueMap[s.sensor_name] ?? null,
+      unit: s.unit || "",
+      lastValue: lastValueMap[s.sensor_code] ?? null,
       hourlyAvg: []
     };
   });
 
   avgRows.forEach(row => {
-    if (sensorMap[row.sensor_name]) {
-      sensorMap[row.sensor_name].hourlyAvg.push(
+    if (sensorMap[row.sensor_code]) {
+      sensorMap[row.sensor_code].hourlyAvg.push(
         Number(row.avg_value.toFixed(2))
       );
     }
   });
 
   return Object.values(sensorMap).sort((a, b) => {
-    const aNum = parseInt(a.name.replace("Sensor ", ""), 10);
-    const bNum = parseInt(b.name.replace("Sensor ", ""), 10);
-    return aNum - bNum;
+    return a.code.localeCompare(b.code);
   });
 }
 

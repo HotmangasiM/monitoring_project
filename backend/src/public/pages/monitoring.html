@@ -1,0 +1,163 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Monitoring Data</title>
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+
+  <link rel="stylesheet" href="../css/variables.css" />
+  <link rel="stylesheet" href="../css/base.css" />
+  <link rel="stylesheet" href="../css/layout.css" />
+  <link rel="stylesheet" href="../css/components.css" />
+  <link rel="stylesheet" href="../css/monitoring.css" />
+</head>
+<body>
+  <div class="app-shell">
+    <aside class="sidebar">
+      <div class="sidebar__brand">
+        <div class="sidebar__logo">I</div>
+        <div>
+          <h1 class="sidebar__title">IoT Panel</h1>
+          <p class="sidebar__subtitle">Monitoring Hub</p>
+        </div>
+      </div>
+
+      <nav class="sidebar__nav">
+        <a href="/" class="nav-link">Dashboard</a>
+        <a href="/pages/monitoring.html" class="nav-link nav-link--active">Monitoring</a>
+        <a href="/pages/sensor.html" class="nav-link">Sensors</a>
+        <a href="#" class="nav-link">Reports</a>
+        <a href="#" class="nav-link">Settings</a>
+      </nav>
+    </aside>
+
+    <main class="main-content">
+      <header class="topbar">
+        <div>
+          <p class="page-eyebrow">Monitoring Data</p>
+          <h2 class="page-title">Hourly Monitoring Records</h2>
+          <p class="page-description">
+            Filter sensor averages by time range and export monitoring reports.
+          </p>
+        </div>
+
+        <div class="topbar__actions">
+          <div class="status-chip">
+            <span class="status-dot status-dot--success"></span>
+            Monitoring Ready
+          </div>
+          <div class="last-update">
+            Last query: <span id="lastQueryText">-</span>
+          </div>
+        </div>
+      </header>
+
+      <section class="panel">
+        <div class="panel__header">
+          <div>
+            <p class="panel__eyebrow">Filters</p>
+            <h3 class="panel__title">Filter Monitoring Data</h3>
+          </div>
+        </div>
+
+        <div class="filter-panel">
+          <div class="filter-field">
+            <label for="from">From</label>
+            <input type="datetime-local" id="from" />
+          </div>
+
+          <div class="filter-field">
+            <label for="to">To</label>
+            <input type="datetime-local" id="to" />
+          </div>
+
+          <div class="filter-field">
+            <label for="locationFilter">Location</label>
+            <select id="locationFilter">
+              <option value="">All locations</option>
+            </select>
+          </div>
+
+          <div class="filter-field">
+            <label for="sensorFilter">Sensor</label>
+            <select id="sensorFilter">
+              <option value="">All sensors</option>
+            </select>
+          </div>
+
+          <div class="filter-actions">
+            <button class="btn btn--primary" id="applyFilter">Apply</button>
+            <button class="btn btn--secondary" id="resetFilter">Reset</button>
+            <button class="btn btn--outline" id="downloadCSV">Download CSV</button>
+          </div>
+        </div>
+      </section>
+
+      <section class="monitoring-summary-grid" id="monitoringSummary">
+        <div class="summary-card">
+          <p class="summary-card__label">Total Records</p>
+          <h3 class="summary-card__value">0</h3>
+        </div>
+        <div class="summary-card">
+          <p class="summary-card__label">Locations</p>
+          <h3 class="summary-card__value">0</h3>
+        </div>
+        <div class="summary-card">
+          <p class="summary-card__label">Sensors</p>
+          <h3 class="summary-card__value">0</h3>
+        </div>
+        <div class="summary-card">
+          <p class="summary-card__label">Selected Range</p>
+          <h3 class="summary-card__value summary-card__value--small">-</h3>
+        </div>
+      </section>
+
+      <section class="panel">
+        <div class="panel__header panel__header--table">
+          <div>
+            <p class="panel__eyebrow">Results</p>
+            <h3 class="panel__title">Monitoring Records</h3>
+          </div>
+
+          <div class="table-meta">
+            <span id="resultCountText">0 records</span>
+          </div>
+        </div>
+
+        <div class="table-wrapper">
+          <table class="monitoring-table">
+            <thead>
+              <tr>
+                <th id="sortLocation" class="sortable">
+                  Location <span class="sort-indicator">↕</span>
+                </th>
+                <th id="sortSensor" class="sortable">
+                  Sensor <span class="sort-indicator">↕</span>
+                </th>
+                <th id="sortHour" class="sortable">
+                  Hour <span class="sort-indicator">↕</span>
+                </th>
+                <th>
+                  Average
+                </th>
+              </tr>
+            </thead>
+            <tbody id="resultBody">
+              <tr>
+                <td colspan="4" class="table-empty">No data loaded yet.</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </section>
+    </main>
+  </div>
+
+  <script src="../js/api.js"></script>
+  <script src="../js/monitoring.js"></script>
+</body>
+</html>
